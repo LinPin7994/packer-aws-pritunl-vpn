@@ -1,0 +1,10 @@
+- name: restart mongo
+  systemd:
+    state: restarted
+    name: mongod
+    enabled: yes
+- name: restart pritunl
+  systemd:
+    state: restarted
+    name: pritunl
+    enabled: yes

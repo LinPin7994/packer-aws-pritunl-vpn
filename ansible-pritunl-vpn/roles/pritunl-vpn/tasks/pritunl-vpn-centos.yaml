@@ -1,0 +1,30 @@
+---
+- name: Install epel release
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
+- name: Copy mongodb and pritunl-vpn repo file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - {src: 'mongodb-org-4.2.repo.j2',dest: '/etc/yum.repos.d/mongodb-org-4.2.repo'}
+    - {src: 'pritunl.repo.j2',dest: '/etc/yum.repos.d/pritunl.repo'}
+- name: Check imported gpg key
+  shell: rpm -qa --qf '%{VERSION}-%{RELEASE} %{SUMMARY}\n' gpg-pubkey*
+  register: rpm_keys
+- name: Import gpg key
+  shell: |
+    gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+    gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A > key.tmp
+    rpm --import key.tmp
+    rm -f key.tmp
+  #when: rpm_keys.stdout.find('Pritunl') == false 
+- name: Install packeges
+  yum:
+   name:
+    - mongodb-org
+    - pritunl
+  notify: 
+   - restart mongo
+   - restart pritunl

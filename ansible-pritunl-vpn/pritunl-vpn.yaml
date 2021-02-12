@@ -1,0 +1,5 @@
+- name: Install pritunl-vpn
+  hosts: default
+  become: yes
+  roles:
+   - pritunl-vpn

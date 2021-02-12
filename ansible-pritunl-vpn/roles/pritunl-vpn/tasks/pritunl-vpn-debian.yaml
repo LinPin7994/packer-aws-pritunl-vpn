@@ -1,0 +1,33 @@
+---
+- name: Install dirmngr and apt-transport-https
+  apt:
+   name: 
+     - dirmngr
+     - apt-transport-https
+- name: Add mongodb repo
+  lineinfile:
+   path: /etc/apt/sources.list.d/mongodb-org-4.2.list
+   line: deb https://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main
+   create: yes
+- name: Add pritunl repo
+  lineinfile:
+   path: /etc/apt/sources.list.d/pritunl.list
+   line: deb https://repo.pritunl.com/stable/apt stretch main
+   create: yes
+- name: Add keys 
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "{{ item }}"
+  loop:
+    - E162F504A20CDF15827F718D4B7C549A058F8B6B
+    - 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+- name: Install packeges
+  apt:
+   name:
+     - pritunl
+     - mongodb-org
+   update_cache: yes
+
+  notify: 
+   - restart mongo
+   - restart pritunl
